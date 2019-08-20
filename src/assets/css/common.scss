@@ -1,0 +1,95 @@
+@import './var.scss';
+//一些颜色定义
+
+html * {
+    box-sizing: border-box;
+    &:before,
+    &:after {
+        box-sizing: border-box;
+    }
+}
+
+body {
+    margin: 0;
+    font-size: $font-size-normal;
+    background: #fff;
+    color: $color-font-normal;
+    font-family: $font-family;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+input,
+textarea,
+button,
+select,
+pre {
+    font-family: $font-family;
+}
+
+input,
+button,
+textarea,
+select,
+a {
+    outline: none;
+}
+
+dl,
+dt,
+ol,
+ul,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    margin: 0;
+    padding: 0;
+}
+
+
+.color-blue {
+    color: $color-blue  !important;
+}
+
+.color-success {
+    color: $success  !important;
+}
+
+.color-warning {
+    color: $warning  !important;
+}
+
+.color-danger {
+    color: $danger  !important;
+}
+
+.color-info {
+    color: $info  !important;
+}
+
+.color-disable {
+    color: $disable  !important;
+} 
+
+
+//链接没有下划线
+a {
+    outline: none;
+    &._no_underline {
+        text-decoration: none;
+    }
+}
+ 
+//一行文字溢出隐藏
+.global-text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+ 
+ 
