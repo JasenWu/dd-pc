@@ -2,25 +2,56 @@ import Vue from 'vue'
 import Router from 'vue-router'
 Vue.use(Router)
 
-const Home = () => import(/* webpackChunkName: "home" */ './views/Home.vue')
-const About = () => import(/* webpackChunkName: "about" */ './views/About.vue')
+const Login = () => import(/* webpackChunkName: "login" */ './views/login.vue')
+const Register = () => import(/* webpackChunkName: "register" */ './views/register.vue')
+const Posts = () => import(/* webpackChunkName: "posts" */ './views/posts.vue')
+const Users = () => import(/* webpackChunkName: "users" */ './views/users.vue')
 
-export default new Router({
+let routers = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: Home
+      path: '/login',
+      name: 'login',
+      component: Login,
+      meta: {
+        title: 'Login'
+      }
     },
     {
-      path: '/about',
-      name: 'about',
+      path: '/register',
+      name: 'register',
+      component: Register,
+      meta: {
+        title: 'Register'
+      }
+    },
+    {
+      path: '/posts',
+      name: 'posts',
+      component: Posts,
+      meta: {
+        title: 'Posts'
+      }
+    },
+    {
+      path: '/users',
+      name: 'users',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: About
+      component: Users,
+      meta: {
+        title: 'users'
+      }
     }
   ]
 })
+
+routers.beforeEach((to, from, next) => {
+  document.querySelector('#title').innerText = to.meta.title
+  next()
+})
+
+export default routers

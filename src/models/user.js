@@ -5,7 +5,7 @@ import {
 
 /** 登录 */
 export const login = (params = {}) => {
-  return Post('login/login', params)
+  return Post('user/login', params, { withCredentials: false })
 }
 
 /** 第三方授权登录 */
