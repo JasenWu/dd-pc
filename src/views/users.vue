@@ -19,10 +19,13 @@
 </template>
 
 <script>
-
+import { getList } from '@models/user'
 export default {
   components: {
     'c-header': require('@views/components/header').default
+  },
+  mounted () {
+    this.getList()
   },
   data () {
     return {
@@ -64,6 +67,13 @@ export default {
     }
   },
   methods: {
+    getList () {
+      getList().then(({ retCode }) => {
+        if (retCode !== this.$api_code.SUCCESS) {
+          return false
+        }
+      })
+    },
     handleSelect (key, keyPath) {
       let config = {
         1: 'posts',
