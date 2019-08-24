@@ -1,57 +1,44 @@
 <template>
   <div class="layout_posts">
-    <el-menu
-      :default-active="activeIndex"
-      class="el-menu-demo"
-      mode="horizontal"
-      @select="handleSelect"
-    >
-      <el-menu-item index="1">Posts</el-menu-item>
-      <el-menu-item index="2">Users</el-menu-item>
-    </el-menu>
+    <c-header />
 
-    <section class="layout_content">
+    <section class="layout_seach_wrap">
+      <el-button @click="add" type="primary" size="small">Add</el-button>
+    </section>
+
+    <section class="global_ayout_content">
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="date" label="日期" width="180"></el-table-column>
-        <el-table-column prop="name" label="姓名" width="180"></el-table-column>
-        <el-table-column prop="address" label="地址"></el-table-column>
+        <el-table-column prop="id" label="序号" width="180"></el-table-column>
+        <el-table-column prop="title" label="标题" width="180"></el-table-column>
+        <el-table-column prop="details" label="详情"></el-table-column>
+        <el-table-column prop="create_time" label="创建时间"></el-table-column>
+        <el-table-column prop="update_time" label="更新时间"></el-table-column>
+        <el-table-column label="操作">
+           <template slot-scope="scope">
+               <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+               <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">Delete</el-button>
+           </template>
+
+        </el-table-column>
       </el-table>
 
       <div class="demo-image__lazy">
         <el-image v-for="url in urls" :key="url" :src="url" lazy></el-image>
       </div>
     </section>
-
   </div>
 </template>
 
 <script>
+import { postList, postDel } from '@models/posts'
+
 export default {
+  components: {
+    'c-header': require('@views/components/header').default
+  },
   data () {
     return {
-      activeIndex: '1',
-      tableData: [
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        },
-        {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
-        },
-        {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
-        }
-      ],
+      tableData: [],
       fits: ['fill', 'contain', 'cover', 'none', 'scale-down'],
       url:
         'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
@@ -66,18 +53,52 @@ export default {
       ]
     }
   },
+  mounted () {
+    this.postList()
+  },
   methods: {
-    handleSelect (key, keyPath) {
-      console.log(key, keyPath)
+    postList () {
+      postList().then(({ retData, retCode }) => {
+        if (retCode !== this.$api_code.SUCCESS) {
+          return false
+        }
+
+        this.tableData = retData || []
+      })
+    },
+    handleEdit (index, row) {
+      this.$router.push({
+        name: 'posts_add',
+        query: {
+          id: row.id
+        }
+      })
+    },
+    handleDelete (index, row) {
+      postDel({ id: row.id }).then(({ retData, retCode, retMsg }) => {
+        if (retCode !== this.$api_code.SUCCESS) {
+          return false
+        }
+        this.$message.success(retMsg)
+        this.postList()
+      })
+    },
+    add () {
+      this.$router.push({
+        name: 'posts_add'
+      })
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.layout_posts{
-  .layout_content{
+.layout_posts {
+  .layout_seach_wrap{
+    display: flex;
+    padding: 20px;
 
   }
+
 }
 </style>

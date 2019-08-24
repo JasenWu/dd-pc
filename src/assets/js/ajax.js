@@ -25,7 +25,7 @@ const doTip = (ret, opt = {}) => {
     if (!opt.ignoreTip) {
       Message({
         showClose: true,
-        message: (retMsg || '发生了一些错误') + ', ' + (opt.errMsg ? opt.errMsg : ''), // + ` [${retCode}]`
+        message: (retMsg || ('发生了一些错误') + ', ' + (opt.errMsg ? opt.errMsg : '')), // + ` [${retCode}]`
         type: 'error'
       })
     }
@@ -175,6 +175,59 @@ export const Get = (oldUrl, data = {}, ajaxData = {}) => {
       withCredentials: true,
       responseType: 'json',
       timeout: 60000,
+      ...ajaxData
+    })
+      .then(({
+        data,
+        status,
+        message
+      }) => {
+        if (status === 200) {
+          doTip(data, ajaxData)
+          return resolve(data)
+        } else {
+          window.badjs && window.badjs.push((message || '服务器错误') + ' ' + (url))
+          if (!ajaxData.ignoreTip) {
+            Message({
+              type: 'error',
+              message: (message || '服务器错误') + ' ' + (url)
+            })
+          }
+          return reject(status)
+        }
+      })
+      .catch((err) => {
+        window.badjs && window.badjs.push((err.message || '服务器错误') + ' ' + (url))
+        if (!ajaxData.ignoreTip) {
+          Message({
+            type: 'error',
+            message: (err.message || '服务器错误') + ' ' + (url)
+          })
+        }
+        return reject(err)
+      })
+  })
+}
+
+/**
+ * 发起post请求
+ * @param oldUrl 请求地址
+ * @param data 请求参数
+ * @param ajaxData 附加ajax配置
+ * @constructor
+ */
+export const Delete = (oldUrl, data = {}, ajaxData = {}) => {
+  let url = realUrl(oldUrl) + '/' + data.id
+  // url = padUrlParams(url)
+  return new Promise((resolve, reject) => {
+    axios({
+      method: 'delete',
+      url: (url),
+
+      withCredentials: true,
+      responseType: 'json',
+      timeout: 60000,
+
       ...ajaxData
     })
       .then(({

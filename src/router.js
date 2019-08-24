@@ -5,6 +5,7 @@ Vue.use(Router)
 const Login = () => import(/* webpackChunkName: "login" */ './views/login.vue')
 const Register = () => import(/* webpackChunkName: "register" */ './views/register.vue')
 const Posts = () => import(/* webpackChunkName: "posts" */ './views/posts.vue')
+const PostsAdd = () => import(/* webpackChunkName: "posts" */ './views/posts_add.vue')
 const Users = () => import(/* webpackChunkName: "users" */ './views/users.vue')
 
 let routers = new Router({
@@ -33,6 +34,14 @@ let routers = new Router({
       component: Posts,
       meta: {
         title: 'Posts'
+      }
+    },
+    {
+      path: '/posts_add',
+      name: 'posts_add',
+      component: PostsAdd,
+      meta: {
+        title: 'add Posts'
       }
     },
     {
