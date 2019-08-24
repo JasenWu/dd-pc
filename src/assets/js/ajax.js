@@ -166,17 +166,26 @@ export const Post = (oldUrl, data = {}, ajaxData = {}) => {
  */
 export const Get = (oldUrl, data = {}, ajaxData = {}) => {
   let url = realUrl(oldUrl)
-  url = padUrlParams(url)
+  // url = padUrlParams(url)
   return new Promise((resolve, reject) => {
-    axios({
+    let config = {
       method: 'get',
       url: (url),
-      params: data,
+      // params: data,
       withCredentials: true,
       responseType: 'json',
       timeout: 60000,
       ...ajaxData
-    })
+    }
+    console.log('ajaxData.resetfull', ajaxData.resetfull)
+
+    if (ajaxData.resetfull) {
+      config.url += `/${data.id}`
+    } else {
+      config.params = data
+    }
+
+    axios(config)
       .then(({
         data,
         status,
@@ -225,6 +234,59 @@ export const Delete = (oldUrl, data = {}, ajaxData = {}) => {
       url: (url),
 
       withCredentials: true,
+      responseType: 'json',
+      timeout: 60000,
+
+      ...ajaxData
+    })
+      .then(({
+        data,
+        status,
+        message
+      }) => {
+        if (status === 200) {
+          doTip(data, ajaxData)
+          return resolve(data)
+        } else {
+          window.badjs && window.badjs.push((message || '服务器错误') + ' ' + (url))
+          if (!ajaxData.ignoreTip) {
+            Message({
+              type: 'error',
+              message: (message || '服务器错误') + ' ' + (url)
+            })
+          }
+          return reject(status)
+        }
+      })
+      .catch((err) => {
+        window.badjs && window.badjs.push((err.message || '服务器错误') + ' ' + (url))
+        if (!ajaxData.ignoreTip) {
+          Message({
+            type: 'error',
+            message: (err.message || '服务器错误') + ' ' + (url)
+          })
+        }
+        return reject(err)
+      })
+  })
+}
+
+/**
+ * 发起post请求
+ * @param oldUrl 请求地址
+ * @param data 请求参数
+ * @param ajaxData 附加ajax配置
+ * @constructor
+ */
+export const Put = (oldUrl, data = {}, ajaxData = {}) => {
+  let url = realUrl(oldUrl) + '/' + data.id
+  // url = padUrlParams(url)
+  return new Promise((resolve, reject) => {
+    axios({
+      method: 'put',
+      url: (url),
+      withCredentials: true,
+      data: data,
       responseType: 'json',
       timeout: 60000,
 
