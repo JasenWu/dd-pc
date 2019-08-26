@@ -14,6 +14,19 @@
           <el-input v-model="postAddForm.title"></el-input>
         </el-form-item>
 
+        <el-form-item>
+          <el-upload
+            class="avatar-uploader"
+            :action="uploadUrl"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+
         <el-form-item label="活动形式" prop="details">
           <el-input type="textarea" rows="15" v-model="postAddForm.details"></el-input>
         </el-form-item>
@@ -26,7 +39,7 @@
 </template>
 
 <script>
-import { postAdd, getDetail, postEdit } from '@models/posts'
+import { postAdd, getDetail, postEdit, uploadUrl } from '@models/posts'
 
 export default {
   components: {
@@ -34,6 +47,7 @@ export default {
   },
   data () {
     return {
+      uploadUrl,
       postAddForm: {
         title: '',
         details: ''
@@ -43,14 +57,34 @@ export default {
           { required: true, message: '请输入活动名称', trigger: 'blur' },
           { min: 3, max: 200, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ],
-        details: [{ required: true, message: '请填写活动形式', trigger: 'blur' }]
-      }
+        details: [
+          { required: true, message: '请填写活动形式', trigger: 'blur' }
+        ]
+      },
+      imageUrl: ''
     }
   },
   mounted () {
     this.initDetail()
   },
   methods: {
+    handleAvatarSuccess (res, file) {
+      console.log('res', res)
+
+      this.imageUrl = URL.createObjectURL(file.raw)
+    },
+    beforeAvatarUpload (file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 / 1024 < 2
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!')
+      }
+      return isJPG && isLt2M
+    },
     getBtnText () {
       let id = this.$route.query.id || null
       let txt = id ? 'Update' : 'Create'
@@ -139,5 +173,32 @@ export default {
   .add_post_form {
     max-width: 800px;
   }
+}
+</style>
+
+<style lang="less">
+
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
 }
 </style>

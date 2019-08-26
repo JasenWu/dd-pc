@@ -2,7 +2,8 @@ import {
   Get,
   Post,
   Delete,
-  Put
+  Put,
+  realUrl
 } from '@assets/js/ajax'
 
 /** 贴子列表 */
@@ -28,3 +29,5 @@ export const getDetail = (params = {}) => {
 export const postEdit = (params = {}) => {
   return Put('api/posts', params, { withCredentials: true, resetfull: true })
 }
+
+export const uploadUrl = realUrl('api/upload')
