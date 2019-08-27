@@ -23,7 +23,9 @@
             :before-upload="beforeAvatarUpload"
           >
             <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+
+            <i v-if="!imageUrl" class="el-icon-plus avatar-uploader-icon"></i>
+            <i v-if="imageUrl && $route.query.id" class="el-icon-edit avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
 
@@ -40,6 +42,7 @@
 
 <script>
 import { postAdd, getDetail, postEdit, uploadUrl } from '@models/posts'
+import { API_DOMAIN } from '@config/index'
 
 export default {
   components: {
@@ -61,6 +64,7 @@ export default {
           { required: true, message: '请填写活动形式', trigger: 'blur' }
         ]
       },
+      imgBaseUrl: '',
       imageUrl: ''
     }
   },
@@ -70,8 +74,11 @@ export default {
   methods: {
     handleAvatarSuccess (res, file) {
       console.log('res', res)
+      let { retData } = res
 
-      this.imageUrl = URL.createObjectURL(file.raw)
+      let imageUrl = API_DOMAIN + '/' + retData.basePath
+      this.imgBaseUrl = retData.basePath
+      this.imageUrl = imageUrl
     },
     beforeAvatarUpload (file) {
       const isJPG = file.type === 'image/jpeg'
@@ -101,6 +108,8 @@ export default {
             title: retData.title,
             details: retData.details
           }
+
+          this.imageUrl = API_DOMAIN + '/' + retData.imageUrl
         })
       }
     },
@@ -110,17 +119,19 @@ export default {
         this.$refs[formName].validate(valid => {
           if (valid) {
             let data = this.postAddForm
-            postAdd(data).then(({ retCode, retMsg, retData }) => {
-              if (retCode !== this.$api_code.SUCCESS) {
-                return false
-              }
-              this.$message.success(retMsg)
-              this.$timeout(1000).then(() => {
-                this.$router.push({
-                  name: 'posts'
+            postAdd({ imageUrl: this.imgBaseUrl, ...data }).then(
+              ({ retCode, retMsg, retData }) => {
+                if (retCode !== this.$api_code.SUCCESS) {
+                  return false
+                }
+                this.$message.success(retMsg)
+                this.$timeout(1000).then(() => {
+                  this.$router.push({
+                    name: 'posts'
+                  })
                 })
-              })
-            })
+              }
+            )
           } else {
             console.log('error submit!!')
             return false
@@ -134,7 +145,8 @@ export default {
           if (valid) {
             let data = {
               ...this.postAddForm,
-              id: this.$route.query.id
+              id: this.$route.query.id,
+              imageUrl: this.imgBaseUrl
             }
             postEdit(data).then(({ retCode, retMsg, retData }) => {
               if (retCode !== this.$api_code.SUCCESS) {
@@ -177,17 +189,30 @@ export default {
 </style>
 
 <style lang="less">
-
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
+.avatar-uploader {
   position: relative;
-  overflow: hidden;
+  .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .el-icon-edit {
+    position: absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    right:0;
+    z-index: 9;
+    background:rgba(0, 0, 0, 0.5)
+
+  }
+  .el-upload:hover {
+    border-color: #409eff;
+  }
 }
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
+
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
