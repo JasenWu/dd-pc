@@ -1,5 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Store from './store'
+import { getUser } from '@models/user'
+import {
+  API_CODE
+} from '@config/api'
 Vue.use(Router)
 
 const Login = () => import(/* webpackChunkName: "login" */ './views/login.vue')
@@ -61,7 +66,14 @@ let routers = new Router({
 
 routers.beforeEach((to, from, next) => {
   document.querySelector('#title').innerText = to.meta.title
-  next()
+  getUser().then(({ retData, retCode, retMsg }) => {
+    if (retCode !== API_CODE.SUCCESS) {
+      return false
+    }
+
+    Store.commit('setUser', retData)
+    next()
+  })
 })
 
 export default routers

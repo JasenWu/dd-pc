@@ -1,5 +1,5 @@
 <template>
-<section class="layout_login">
+<section class="layout_login" @keyup="enterClick">
 
   <el-row :gutter="20">
     <el-col :span="6" :offset="9" :xs="{span:20,offset:2}">
@@ -40,7 +40,20 @@ export default {
       }
     }
   },
+  mounted () {
+    this.initPage()
+  },
   methods: {
+    enterClick (ev) {
+      ev.keyCode === 13 && this.onSubmit()
+    },
+    initPage () {
+      if (this.$store.state.user.id) {
+        this.$router.push({
+          name: 'posts'
+        })
+      }
+    },
     onSubmit () {
       login({ ...this.form }).then(({ retCode, retMsg, retData }) => {
         if (retCode !== this.$api_code.SUCCESS) {

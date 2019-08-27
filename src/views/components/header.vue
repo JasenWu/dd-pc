@@ -21,7 +21,20 @@ import { logout } from '@models/user'
 export default {
   data () {
     return {
-      activeIndex: '1'
+
+    }
+  },
+  computed: {
+    activeIndex () {
+      let config = {
+        posts: '1',
+        users: '2'
+
+      }
+
+      let routerName = this.$route.name
+
+      return config[routerName]
     }
   },
   methods: {
